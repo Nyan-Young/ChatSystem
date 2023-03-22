@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upupup.dao.UserInfoDao">
+    <select id="selectOne" resultType="UserInfo">
+        select id,user_name,password,gender,birthdate from user_info where id=#{id};
+    </select>
+    <select id="selectOneByUser" resultType="UserInfo">
+        select id,user_name,password,gender,birthdate from user_info where user_name=#{userName};
+    </select>
+    <insert id="insertUserInfo">
+        insert into user_info(user_name,password,gender,birthdate) values(#{userName},#{password},#{gender},#{birthdate});
+    </insert>
+    <update id="updateUserInfo">
+        update user_info set gender=#{gender},birthdate=#{birthdate} where id=#{id};
+    </update>
+    <update id="updateUserGender">
+        update user_info set gender=#{gender} where id=#{id};
+    </update>
+    <update id="updateUserBirthdate">
+        update user_info set birthdate=#{birthdate} where id=#{id};
+    </update>
+    <update id="updatePassword">
+        update user_info set password=#{password} where id=#{id} and password=#{user_name};
+    </update>
+</mapper>

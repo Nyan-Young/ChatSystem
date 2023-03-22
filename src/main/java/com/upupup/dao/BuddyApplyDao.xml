@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upupup.dao.BuddyApplyDao">
+    <insert id="insertApply">
+        insert into buddy_apply (id,apply_id) values(#{id},#{applyId});
+    </insert>
+    <select id="selectApply" resultType="buddyApply">
+        select id,apply_id from buddy_apply where id=#{id} and apply_id=#{applyId};
+    </select>
+    <select id="selectAllId" resultType="UserInfo">
+        select
+        user_info.id,
+        user_info.user_name
+        from buddy_apply
+        inner join user_info
+        on (buddy_apply.id=user_info.id)
+        where buddy_apply.apply_id=#{applyId};
+    </select>
+    <select id="selectAllApply" resultType="UserInfo">
+        select
+        user_info.id,
+        user_info.user_name
+        from buddy_apply
+        inner join user_info
+        on (buddy_apply.apply_id=user_info.id)
+        where buddy_apply.id=#{id};
+    </select>
+    <delete id="deleteApply">
+        delete from buddy_apply where id=#{id} and apply_id=#{applyId};
+    </delete>
+</mapper>

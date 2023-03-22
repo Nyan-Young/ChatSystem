@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ch/zn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>我的-基本信息</title>
+    <style>
+        html{
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            background: honeydew;
+        }
+        #mine_basic{
+            height: 270px;
+            width: 400px;
+            margin: 0 auto;
+            background: lemonchiffon;
+            border: burlywood dotted 5px;
+            border-radius: 15px;
+        }
+        .info{
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: #aed7dd;
+            margin-top: 30px;
+            margin-left: 100px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+<div id="mine_basic">
+    <p class="info">用户ID：<span id="userId"></span></p>
+    <p class="info">用户名：<span id="userName"></span></p>
+    <p class="info">性&emsp;别：<span id="gender"></span></p>
+    <p class="info">生&emsp;日：<span id="birthdate"></span></p>
+</div>
+<script>
+    //tab我的
+    document.getElementById("userId").innerText=localStorage.getItem("id");
+    document.getElementById("userName").innerText=localStorage.getItem("userName");
+    document.getElementById("gender").innerText=localStorage.getItem("gender");
+    document.getElementById("birthdate").innerText=localStorage.getItem("birthdate");
+</script>
+</body>
+</html>

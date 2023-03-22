@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ch/zn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>查找</title>
+    <style>
+        html{
+            position: absolute;
+            height: 350px;
+            width: 800px;
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            text-align: center;
+        }
+        .bdy{
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: #aed7dd;
+            margin-top: 10px;
+            margin-left: 60px;
+            text-align: left;
+        }
+        .res{
+            height: 25px;
+            width: 200px;
+            font-family: 等线,serif;
+            font-size: 22px;
+            letter-spacing: 3px;
+            color: darkblue;
+            border: #aed7dd dotted 5px;
+            background: lemonchiffon;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .res0{
+            height: 25px;
+            width: 200px;
+            font-family: 等线,serif;
+            font-size: 22px;
+            letter-spacing: 3px;
+            color: darkblue;
+            border: #aed7dd dotted 5px;
+            background: lemonchiffon;
+            margin: 100px auto 0 auto;
+            text-align: center;
+        }
+        #res{
+            display: block;
+            position: absolute;
+            margin: 10px 0 0 213px;
+            width: 350px;
+            height: 250px;
+            background: aliceblue;
+            border: #fcea00 dashed 5px;
+            border-radius: 30px;
+            padding-top: 10px;
+        }
+        .searchBtn{
+            background: #aed7dd;
+            color: #fffcff;
+            height: 35px;
+            width: 80px;
+            text-align: center;
+            font-size: 15px;
+            border: #fcea00 solid 2px;
+            border-radius: 0 20px 20px 0;
+            margin: 20px 0 0 -5px;
+            box-sizing: border-box;
+            vertical-align: top;
+            display: inline-block;
+        }
+        .searchBtn:hover{
+            background: lemonchiffon;
+            color: #aed7dd;
+        }
+        .btn{
+            background: lemonchiffon;
+            color: #aed7dd;
+            height: 35px;
+            width: auto;
+            text-align: center;
+            font-size: 15px;
+            border: #fcea00 solid 2px;
+            border-radius: 15px;
+            margin: 5px;
+            padding: 5px 10px 5px 10px;
+            box-sizing: border-box;
+        }
+        .btn:hover{
+            background: #aed7dd;
+            color: #fffcff;
+        }
+        input{
+            height: 35px;
+            width: 220px;
+            border: #fcea00 solid;
+            background: #fffcff;
+            border-width: 2px 0 2px 2px;;
+            border-radius: 20px 0 0 20px;
+            margin: 20px 0 0 0;
+            text-indent: 15px;
+            font-size: 15px;
+            box-sizing: border-box;
+            vertical-align: top;
+            display: inline-block;
+        }
+        input:focus{
+            outline: none;
+            background: honeydew;
+        }
+    </style>
+</head>
+<body>
+<input type="text" placeholder="请输入用户ID" name="buddyId" id="buddyId">
+<button type="button" onclick="chazhao(buddyId.value)" class="searchBtn">查&emsp;找</button>
+<div id="res">
+    <p class="res0">查询结果页</p>
+</div>
+<script>
+    var pxhttp=parent.xhttp;
+    var userId=localStorage.getItem("id");
+    var buddy=localStorage.getItem("buddyList").split(",");
+    var websocket=parent.websocket
+    //加好友
+    function addBuddy(buddyId) {
+        pxhttp.open("POST","/sendApply",true);
+        pxhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+        pxhttp.send("id="+userId+"&buddyId="+buddyId);
+        pxhttp.onreadystatechange=function(){
+            if(pxhttp.status===200&&pxhttp.readyState===4){
+                var res=document.getElementById("res");
+                var add=document.getElementById("add");
+                var newChild=document.createElement("p");
+                newChild.className="res";
+                newChild.innerText="等待对方添加";
+                res.removeChild(add);
+                res.appendChild(newChild);
+                var time=(new Date()).toLocaleString();
+                var msgJ={
+                    type:"apply",
+                    name:buddyId,
+                    time:time
+                }
+                var msg=JSON.stringify(msgJ);
+                websocket.send(msg);
+            }
+        }
+    }
+    //跳转聊天页面
+    function goChat(buddyId) {
+        localStorage.setItem("current_buddy",buddyId);
+        parent.location.href="home#chat";
+        parent.location.reload();
+    }
+    //同意好友申请
+    function agreeBuddy(buddyId) {
+        pxhttp.open("POST","/agreeApply",true);
+        pxhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+        pxhttp.send("id="+userId+"&buddyId="+buddyId);
+        pxhttp.onreadystatechange=function(){
+            if(pxhttp.status===200&&pxhttp.readyState===4){
+                buddy.push(buddyId);
+                if(buddy[0]===""){
+                    buddy.splice(0,1);
+                }
+                parent.location.href="home#buddy";
+                parent.location.reload();
+                var time=(new Date()).toLocaleString();
+                var msgJ={
+                    type:"add",
+                    name:buddyId,
+                    time:time
+                }
+                var msg=JSON.stringify(msgJ);
+                websocket.send(msg);
+            }
+        }
+    }
+    //tab查找
+    function chazhao(buddyId) {
+        if(buddyId===""){
+            return;
+        }
+        if(buddyId===localStorage.getItem("id")){
+            parent.location.href="home";
+            return;
+        }
+        pxhttp.open("POST","/info",true);
+        pxhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+        pxhttp.send("id="+userId+"&buddyId="+buddyId);
+        pxhttp.onreadystatechange=function(){
+            if(pxhttp.status===200&&pxhttp.readyState===4){
+                if(pxhttp.responseText!=="用户ID不存在"){
+                    var strs=pxhttp.responseText.split("+");
+                    var isBuddy="<button id='add' class='btn' onclick='addBuddy(buddyId.value)'>加好友</button>";
+                    if(buddy.indexOf(buddyId)!==-1){
+                        isBuddy="<button id='send' class='btn' onclick='goChat(buddyId.value)'>发消息</button>";
+                    }else if(strs[5]==="等待对方添加"){
+                        isBuddy="<p class='res'>等待对方添加</p>"
+                    }else if(strs[5]==="同意添加好友"){
+                        isBuddy="<button id='agree' class='btn' onclick='agreeBuddy(buddyId.value)'>同意添加好友</button>";
+                    }
+
+                    document.getElementById("res").innerHTML=
+                        "<p class='bdy'>用户ID："+strs[0]+"</p>"+
+                        "<p class='bdy'>用户名："+strs[1]+"</p>"+
+                        "<p class='bdy'>性&emsp;别："+strs[3]+"</p>"+
+                        "<p class='bdy'>生&emsp;日："+strs[4]+"</p>"+
+                        isBuddy;
+                }else {
+                    document.getElementById("res").innerHTML=
+                        "<p class='res0'>"+pxhttp.responseText+"</p>";
+                }
+
+                //    pxhttp.responseText
+            }
+        }
+    }
+</script>
+</body>
+</html>

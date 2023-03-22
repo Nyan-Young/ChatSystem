@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ch/zn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>登录</title>
+    <style>
+        html{
+            background: url("/image/main-background.jpg") no-repeat;
+            background-size: cover;
+            -webkit-background-size: cover;/* 兼容Webkit内核浏览器如Chrome和Safari */
+            -o-background-size: cover;/* 兼容Opera */
+            height: 100%;
+            width: 100%;
+            top: 0;
+            left: 0;
+            position: absolute;
+            overflow: hidden;
+        }
+        form{
+            position: absolute;
+            height: 300px;
+            width: 500px;
+            top: 50%;
+            left: 50%;
+            margin-top: -150px;
+            margin-left: -250px;
+            background: transparent;
+            text-align: center;
+            padding-top: 30px;
+            font-size: 30px;
+            font-family: 等线,serif;
+            color: #fffcff;
+        }
+        a{
+            line-height: 40px;
+            color: #fffcff;
+            text-decoration-line: none;
+            font-size: 20px;
+        }
+        .info-style{
+            height: 50px;
+            width: 260px;
+            border: #eddd63 solid 2px;
+            border-radius: 20px;
+            margin: 10px;
+            text-indent: 20px;
+            font-size: 20px;
+        }
+        .sub-style{
+            background: #aed7dd;
+            color: #fffcff;
+            height: 35px;
+            width: 170px;
+            text-align: center;
+            font-size: 30px;
+            font-family: 华文行楷,serif;
+            border: #eddd63 solid 3px;
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .sub-style:hover{
+            background: #fffcff;
+            color: #aed7dd;
+        }
+        input:focus{
+            outline: none;
+            background: honeydew;
+        }
+    </style>
+    <script>
+        var xhttp;
+        if (window.XMLHttpRequest) {
+            xhttp = new XMLHttpRequest();
+        } else {
+            // code for IE6, IE5
+            xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        function func(userName,password) {
+            if(userName===""||password===""){
+                return;
+            }
+            xhttp.open("POST","/login0",true);
+            xhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+            xhttp.send("userName="+ userName+"&password="+password);
+            xhttp.onreadystatechange=function(){
+                if(xhttp.status===200&&xhttp.readyState===4){
+                    if(xhttp.responseText==="用户名不存在"||xhttp.responseText==="密码错误"){
+                        alert(xhttp.responseText);
+                    }else {
+                        var infos=xhttp.responseText.split("+");
+                        localStorage.setItem("id",infos[0]);
+                        localStorage.setItem("userName",infos[1]);
+                        localStorage.setItem("gender",infos[3]);
+                        localStorage.setItem("birthdate",infos[4]);
+                        localStorage.setItem("buddyList",(infos[5].split(/[, ]/)).toLocaleString());
+                        localStorage.setItem("temp","");
+                        localStorage.setItem("current_buddy",localStorage.getItem("buddyList").split(",")[0]);
+                        localStorage.setItem("msgList","");
+                        localStorage.setItem("confList","");
+                        window.location.href="/home";
+                    }
+
+                    //    xhttp.responseText
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+<form method="post" accept-charset="UTF-8">
+    用户名：<input class="info-style" type="text" name="userName" id="userName"><br/>
+    密&emsp;码：<input class="info-style" type="password" name="password" id="password"><br/>
+    <input class="sub-style" type="button" value="登&emsp;录" onclick="func(userName.value,password.value)"><br/>
+    <a href="/register">尚无账号？立即注册</a>
+</form>
+</body>
+</html>

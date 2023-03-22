@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ch/zn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>我的</title>
+    <style>
+        html{
+            position: absolute;
+            height: 350px;
+            width: 800px;
+            margin: 0;
+            padding: 0;
+        }
+        ul{
+            display: inline-block;
+            overflow: hidden;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-align: center;
+            line-height: 50px;
+            font-size: 18px;
+            letter-spacing: 3px;
+        }
+        .lis{
+            width: 200px;
+            height: 50px;
+            border-radius: 0 25px 25px 0;
+            margin: 20px 0 0 0;
+            padding: 0;
+        }
+        .unselected{
+            background: #fffcff;
+            border: lemonchiffon 5px solid;
+            color: burlywood;
+        }
+        .selected{
+            background: lemonchiffon;
+            border: burlywood 5px solid;
+            color: #aed7dd;
+        }
+        ul li:hover{
+            background: aliceblue;
+            border: #fffcff 5px solid;
+            color: burlywood;
+        }
+        ul li a{
+            text-decoration-line: none;
+            color: inherit;
+        }
+        .mine{
+            position: absolute;
+            display: inline;
+            height: 300px;
+            width: 500px;
+            margin: 20px 0 0 40px;
+            text-align: center;
+            padding: 0;
+        }
+        #basic:target,
+        #update:target,
+        #password:target,
+        #logout:target
+        {
+            z-index: 1;
+        }
+        object{
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<ul id="mineTab">
+    <li class="lis unselected"><a href="#basic" onclick="mineColor(0)">基本信息</a></li>
+    <li class="lis unselected"><a href="#update" onclick="mineColor(1)">修改信息</a></li>
+    <li class="lis unselected"><a href="#password" onclick="mineColor(2)">修改密码</a></li>
+    <li class="lis unselected"><a href="#logout" onclick="mineColor(3)">退出登录</a></li>
+</ul>
+<div id="update" class="mine">
+    <object type="text/html" data="home_mine_update.html"></object>
+</div>
+<div id="password" class="mine">
+    <object type="text/html" data="home_mine_password.html"></object>
+</div>
+<div id="logout" class="mine">
+    <object type="text/html" data="home_mine_logout.html"></object>
+</div>
+<div id="basic" class="mine">
+    <object type="text/html" data="home_mine_basic.html"></object>
+</div>
+<script>
+    var ulli=document.getElementById("mineTab").getElementsByTagName("li");
+    switch (window.location.hash) {
+        case "#update":
+            ulli[1].className="lis selected";
+            break;
+        case "#password":
+            ulli[2].className="lis selected";
+            break;
+        case "#logout":
+            ulli[3].className="lis selected";
+            break;
+        default:
+            ulli[0].className="lis selected";
+    }
+    function mineColor(index) {
+        var mineTab=document.getElementById("mineTab");
+        var lis=mineTab.getElementsByTagName("li");
+        for(var i=0;i<lis.length;i++){
+            lis[i].className="lis unselected";
+        }
+        lis[index].className="lis selected";
+    }
+</script>
+</body>
+</html>

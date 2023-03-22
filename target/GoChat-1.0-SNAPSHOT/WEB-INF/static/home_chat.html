@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ch/zn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>聊天</title>
+    <style>
+        html{
+            position: absolute;
+            height: 350px;
+            width: 800px;
+            margin: 0;
+            padding: 10px;
+            overflow: hidden;
+        }
+        #buddy_id{
+            position: absolute;
+            height: 30px;
+            width: 520px;
+            background: aliceblue;
+            color: #aed7dd;
+            margin-left: 130px;
+            border: burlywood solid 2px;
+            text-align: center;
+        }
+        #chat_record{
+            position: absolute;
+            height: 175px;
+            width: 520px;
+            background: #fffcff;
+            color: #fcea00;
+            margin-top: 30px;
+            overflow-x: hidden;
+            overflow-y: scroll;
+            border: burlywood solid 2px;
+            margin-left: 130px;
+        }
+        #type_space{
+            position: absolute;
+            height: 100px;
+            width: 520px;
+            background: lemonchiffon;
+            color: burlywood;
+            margin-top: 205px;
+            border: burlywood solid 2px;
+            margin-left: 130px;
+        }
+        .user{
+            font-size: 15px;
+            line-height: 15px;
+            margin: 20px 12px 2px 12px;
+        }
+        .user_l{
+            color: cadetblue;
+            text-align: left;
+        }
+        .user_r{
+            color: blueviolet;
+            text-align: right;
+        }
+        .time{
+            color: burlywood;
+            font-size: 10px;
+            line-height: 10px;
+            margin: 0 20px 8px 20px;
+        }
+        .time_l{
+            text-align: left;
+        }
+        .time_r{
+            text-align: right;
+        }
+        .pstyle{
+            width: 350px;
+            height: fit-content;
+            color: cornflowerblue;
+        }
+        .pstyle_l{
+            text-align: left;
+            margin: 3px 0 5px 20px;
+        }
+        .pstyle_r{
+            text-align: right;
+            margin: 3px 0 5px 145px;
+        }
+        span{
+            display: inline-block;
+            width: fit-content;
+            background: aliceblue;
+            padding: 3px;
+            word-break: break-all;
+        }
+        #message{
+            border: transparent;
+            background: transparent;
+            color: black;
+            display: block;
+            width: 100%;
+            height: 70px;
+            resize: none;
+            margin: 0;
+        }
+        button{
+            display: block;
+            width: 80px;
+            height: 22px;
+            font-size: 15px;
+            line-height: 15px;
+            background: aliceblue;
+            border-radius: 10px;
+            border-width: 0;
+            margin-left: 430px;
+            color: #aed7dd;
+        }
+        button:hover{
+            background: burlywood;
+            color: aliceblue;
+        }
+        #message:focus{
+            outline: none;
+        }
+        #empty{
+            width: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+        }
+        a{
+            height: 15px;
+            width: 150px;
+            font-size: 15px;
+            background: transparent;
+            color: cornflowerblue;
+            margin: 0 auto;
+            text-align: center;
+            padding: 0;
+            display: block;
+        }
+        /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+        ::-webkit-scrollbar
+        {
+            width: 5px;
+            background-color: transparent;
+        }
+
+        /*定义滚动条轨道 内阴影+圆角*/
+        ::-webkit-scrollbar-track
+        {
+            background-color: transparent;
+        }
+
+        /*定义滑块 内阴影+圆角*/
+        ::-webkit-scrollbar-thumb
+        {
+            border-radius: 10px;
+            background-color: #fcea00;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        
+    </div>
+        <div id="buddy_id"></div>
+        <div id="chat_record">
+            <a onclick="records()">查看历史消息</a>
+            <p id="empty"></p>
+        </div>
+        <div id="type_space">
+            <textarea name="message" id="message"
+                      onkeyup="up(this.value)"></textarea>
+            <button type="button" onclick="sendMsg(message.value)">发送</button>
+        </div>
+<script>
+    var websocket=parent.websocket;
+    var userId=localStorage.getItem("id");
+    var buddy=localStorage.getItem("current_buddy");
+    var buddyList=localStorage.getItem("buddyList").split(",");
+    var num=buddyList.indexOf(buddy);
+    var pxhttp=parent.xhttp;
+    if(num%2!==0){
+        num=buddyList.lastIndexOf(buddy);
+    }
+    var count=0;
+    if(buddy!==""){
+        records();
+        document.getElementById("buddy_id").innerText=buddyList[num+1];
+        document.getElementById("message").innerText=localStorage.getItem("temp");
+        var me=userId+":"+localStorage.getItem("userName");
+        var you=buddy+":"+buddyList[num+1];
+    }
+    window.addEventListener("storage",function (e) {
+        if(e.key==="newMsg"){
+            var obj=JSON.parse(e.newValue);
+            if(obj.type!==undefined){
+                updateList(obj.type,obj.name);
+            }
+            writeMsg(obj.message,obj.name,obj.time,false);
+        }else if(e.key==="records"){
+            var rec=JSON.parse(e.newValue);
+            for (var i = 0; i < rec.length-1; i++) {
+                writeMsg(rec[i].message,rec[i].name,rec[i].time,true);
+            }
+        }
+    })
+    function up(input) {
+        var message=document.getElementById("message");
+        if(input.indexOf("\n")!==-1){
+            message.value=input.replace(/[\n]/g,'');
+            sendMsg(message.value);
+        }else{
+            message.value=input.replace(/[{}]/g,'');
+        }
+    }
+    function sendMsg(message) {
+        if(message===""){
+            return;
+        }
+        var time=(new Date()).toLocaleString();
+        var msgJ={
+            message:message,
+            name:buddy,
+            time:time
+        }
+        var msg=JSON.stringify(msgJ);
+        document.getElementById("message").value="";
+        websocket.send(msg);
+        writeMsg(message,userId,time,false);
+    }
+    function records() {
+        var my={
+            buddy:buddy,
+            num:count
+        }
+        websocket.send(JSON.stringify(my));
+    }
+    function writeMsg(msg,id,time,rcd) {
+        var record=document.getElementById("chat_record");
+        var newChild=new Array();
+        for (var i = 0; i < 3; i++) {
+            newChild[i]=document.createElement("p");
+        }
+        newChild[1].innerHTML="<span>"+msg+"</span>"
+        newChild[2].innerText=time;
+        if(id!==userId){
+            newChild[0].innerText=you;
+            newChild[0].className="user user_l";
+            newChild[1].className="pstyle pstyle_l";
+            newChild[2].className="time time_l";
+        }else{
+            newChild[0].innerText=me;
+            newChild[0].className="user user_r";
+            newChild[1].className="pstyle pstyle_r";
+            newChild[2].className="time time_r";
+        }
+        if(rcd===false){
+            for (var i = 0; i < 3; i++) {
+                record.appendChild(newChild[i]);
+            }
+            record.scrollTop=record.scrollHeight-record.clientHeight;
+        }else{
+            var node=record.getElementsByTagName("p");
+            for (var i = 2; i >= 0; i--) {
+                record.insertBefore(newChild[i],node[0]);
+            }
+        }
+        count++;
+    }
+    function updateList(type,buddyId) {
+        pxhttp.open("POST","/buddyList",true);
+        pxhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+        pxhttp.send("id="+userId);
+        pxhttp.onreadystatechange=function(){
+            if(pxhttp.status===200&&pxhttp.readyState===4){
+                localStorage.setItem("buddyList",(pxhttp.responseText.split(/[, ]/)).toLocaleString());
+                localStorage.setItem("temp",document.getElementById("message").innerText);
+                parent.location.reload();
+            }
+        }
+    }
+</script>
+</body>
+</html>

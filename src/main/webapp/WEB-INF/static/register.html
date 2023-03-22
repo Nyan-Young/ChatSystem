@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ch/zn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>注册</title>
+    <style>
+        html{
+            background: url("/image/main-background.jpg") no-repeat;
+            background-size: cover;
+            -webkit-background-size: cover;/* 兼容Webkit内核浏览器如Chrome和Safari */
+            -o-background-size: cover;/* 兼容Opera */
+            height: 100%;
+            width: 100%;
+            top: 0;
+            left: 0;
+            position: absolute;
+            overflow: hidden;
+        }
+        form{
+            position: absolute;
+            height: 300px;
+            width: 500px;
+            top: 50%;
+            left: 50%;
+            margin-top: -150px;
+            margin-left: -250px;
+            background: transparent;
+            text-align: center;
+            padding-top: 10px;
+            font-size: 20px;
+            font-family: 等线,serif;
+            color: #fffcff;
+        }
+        a{
+            line-height: 40px;
+            color: #fffcff;
+            text-decoration-line: none;
+            font-size: 20px;
+        }
+        .info-style{
+            height: 30px;
+            width: 260px;
+            border: #eddd63 solid 2px;
+            border-radius: 20px;
+            margin: 5px;
+            text-indent: 15px;
+            font-size: 16px;
+        }
+        .radio-style{
+            margin: 15px;
+            background: #fffcff;
+        }
+        .sub-style{
+            background: #aed7dd;
+            color: #fffcff;
+            height: 35px;
+            width: 170px;
+            text-align: center;
+            font-size: 30px;
+            font-family: 华文行楷,serif;
+            border: #eddd63 solid 3px;
+            border-radius: 10px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .sub-style:hover{
+            background: #fffcff;
+            color: #aed7dd;
+        }
+        input:focus{
+            outline: none;
+            background: honeydew;
+        }
+    </style>
+    <script>
+        var xhttp;
+        if (window.XMLHttpRequest) {
+            xhttp = new XMLHttpRequest();
+        } else {
+            // code for IE6, IE5
+            xhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+        function func(userName,password,password0,gender,birthdate) {
+            if(userName===""||password===""){
+                return;
+            }
+            if(password!==password0){
+                alert("密码验证不一致！")
+            }
+            xhttp.open("POST","/register0",true);
+            xhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+            xhttp.send("userName="+ userName+"&password="+password+"&gender="+gender+"&birthdate="+birthdate);
+            xhttp.onreadystatechange=function(){
+                if(xhttp.status==200&&xhttp.readyState==4){
+                    alert(xhttp.responseText);
+                    if(xhttp.responseText==="注册成功"){
+                        window.location.href="/login";
+                    }
+                    //    xhttp.responseText
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+<form method="post" accept-charset="UTF-8">
+    用&ensp;户&ensp;名：<input class="info-style" type="text" name="userName" onkeyup="this.value=this.value.replace(/[^0-9a-zA-Z]/g,'')"><br/>
+    密&emsp;&emsp;码：<input class="info-style" type="password" name="password"><br/>
+    确认密码：<input class="info-style" type="password" name="password0"><br/>
+    性&emsp;&emsp;别：<input class="radio-style" type="radio" name="gender" value="1">男&ensp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<input class="radio-style" type="radio" name="gender" value="0">女&emsp;<br/>
+    出生日期：<input class="info-style" type="date" name="birthdate"><br/>
+    <input class="sub-style" type="button" value="注&emsp;册" onclick="func(userName.value,password.value,password0.value,gender.value,birthdate.value)"><br/>
+    <a href="/login">已有账号？立即登录</a>
+</form>
+</body>
+</html>

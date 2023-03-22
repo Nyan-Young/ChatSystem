@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ch/zn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>我的-修改信息</title>
+    <style>
+        html{
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            background: honeydew;
+        }
+        #mine_update{
+            height: 270px;
+            width: 400px;
+            margin: 0 auto;
+            background: burlywood;
+            border: lemonchiffon dotted 5px;
+            border-radius: 15px;
+        }
+        .info{
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: #fffcff;
+            margin: 30px 0 0 20px;
+            text-align: left;
+        }
+        .radio-style{
+            box-sizing: border-box;
+            background: #fffcff;
+            display: inline;
+        }
+        .info-style{
+            box-sizing: border-box;
+            display: inline;
+            height: 30px;
+            width: 180px;
+            border: #eddd63 solid 2px;
+            border-radius: 20px;
+            text-indent: 5px;
+            font-size: 16px;
+        }
+        .sub-style{
+            box-sizing: border-box;
+            display: inline-block;
+            background: lemonchiffon;
+            color: burlywood;
+            height: 30px;
+            width: 80px;
+            text-align: center;
+            font-size: 15px;
+            border: #eddd63 solid 3px;
+            border-radius: 10px;
+            float: right;
+            margin-right: 20px;
+        }
+        .sub-style:hover{
+            background: #fffcff;
+            color: #aed7dd;
+        }
+        input:focus{
+            outline: none;
+            background: honeydew;
+        }
+    </style>
+</head>
+<body>
+<div id="mine_update">
+    <form method="post" accept-charset="UTF-8">
+        <p class="info">用户ID：<span id="userId"></span></p>
+        <p class="info">用户名：<span id="userName"></span></p>
+        <p class="info">性&emsp;别：
+            <input class="radio-style" type="radio" name="gender" value="1">男&emsp;&emsp;&emsp;
+            <input class="radio-style" type="radio" name="gender" value="0">女&nbsp;<input class="sub-style" type="button" value="修&emsp;改" onclick="updateGender(gender.value)">
+        </p>
+        <p class="info">生&emsp;日：<input class="info-style" type="date" name="birthdate"><input class="sub-style" type="button" value="修&emsp;改" onclick="updateBirthdate(birthdate.value)">
+        </p>
+    </form>
+</div>
+<script>
+    //tab我的-修改信息
+    var id=localStorage.getItem("id");
+    document.getElementById("userId").innerText=id;
+    document.getElementById("userName").innerText=localStorage.getItem("userName");
+    ppxhttp=parent.parent.xhttp;
+    function updateGender(gender) {
+        if(gender===""){
+            return;
+        }
+        ppxhttp.open("POST", "/updateInfo", true);
+        ppxhttp.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
+        ppxhttp.send("id=" + id + "&gender=" + gender);
+        ppxhttp.onreadystatechange = function () {
+            if (ppxhttp.status === 200 && ppxhttp.readyState === 4) {
+                strs = ppxhttp.responseText.split("+");
+                localStorage.setItem("gender", strs[3]);
+                parent.parent.location.reload();
+            }
+        }
+    }
+    function updateBirthdate(birthdate) {
+        if(birthdate===""){
+            return;
+        }
+        ppxhttp.open("POST", "/updateInfo", true);
+        ppxhttp.setRequestHeader('content-type', 'application/x-www-form-urlencoded');
+        ppxhttp.send("id=" + id + "&birthdate=" + birthdate);
+        ppxhttp.onreadystatechange = function () {
+            if (ppxhttp.status === 200 && ppxhttp.readyState === 4) {
+                strs = ppxhttp.responseText.split("+");
+                localStorage.setItem("birthdate", strs[4]);
+                parent.parent.location.reload();
+            }
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.upupup.dao.BuddyListDao">
+    <select id="selectAllById" resultType="UserInfo">
+        select
+        user_info.id,
+        user_info.user_name
+        from buddy_list
+        inner join user_info
+        on (buddy_list.buddy_id=user_info.id)
+        where buddy_list.id=#{id};
+    </select>
+    <select id="selectAllByBuddyId" resultType="UserInfo">
+        select
+        user_info.id,
+        user_info.user_name
+        from buddy_list
+        inner join user_info
+        on (buddy_list.id=user_info.id)
+        where buddy_list.buddy_id=#{buddyId};
+    </select>
+    <select id="selectOneById" resultType="java.lang.Integer">
+        select buddy_id from buddy_list where id=#{id};
+    </select>
+    <select id="selectOneByBuddyId" resultType="java.lang.Integer">
+        select id from buddy_list where buddy_id=#{buddyId};
+    </select>
+    <select id="selectBuddyList" resultType="BuddyList">
+        select id,buddy_id from buddy_list where id=#{id} and buddy_id=#{buddyId};
+    </select>
+    <insert id="insertBuddy">
+        insert into buddy_list(id,buddy_id) values(#{id},#{buddyId});
+    </insert>
+    <delete id="deleteBuddy">
+        delete from buddy_list where id=#{id} and buddy_id=#{buddyId};
+    </delete>
+</mapper>

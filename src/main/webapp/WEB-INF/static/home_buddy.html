@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ch/zn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>好友</title>
+    <style>
+        html{
+            position: absolute;
+            height: 350px;
+            width: 800px;
+            margin: 0;
+            padding: 0;
+        }
+        body{
+            border: 0;
+            padding: 0;
+        }
+        ul{
+            display: block;
+            overflow: hidden;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-align: center;
+            line-height: 35px;
+            font-size: 18px;
+            letter-spacing: 3px;
+            height: 225px;
+            overflow-y: scroll;
+            background: lemonchiffon;
+        }
+        .lis{
+            border: burlywood solid;
+            border-width: 0 0 3px 0;
+        }
+        .unselected{
+            background: aliceblue;
+            color: burlywood;
+        }
+        .selected{
+            background: honeydew;;
+            color: #aed7dd;
+        }
+        ul li:hover{
+            background: lemonchiffon;
+        }
+        object{
+            height: 100%;
+            width: 100%;
+        }
+        #list{
+            width: 205px;
+            height: 320px;
+            background: #fffcff;
+            float: left;
+            border-radius: 20px 0 0 20px;
+            border: burlywood dashed;
+            border-width:  5px 0 5px 5px;
+            overflow: hidden;
+        }
+        #detail{
+            width: 569px;
+            height: 320px;
+            background: lemonchiffon;
+            float: right;
+            border-radius: 0 20px 20px 0;
+            border: burlywood dashed;
+            border-width:  5px 5px 5px 0;
+        }
+        .child{
+            display: inline-block;
+            width: 265px;
+            height: 300px;
+            padding: 0;
+            margin: 6px;
+            background: transparent;
+            border: #aed7dd double 2px;
+            color: blueviolet;
+            vertical-align: top;
+            text-align: center;
+            line-height: 50px;
+            font-size: 20px;
+            /*overflow-y: scroll;*/
+            border-radius: 50px;
+        }
+        span{
+            font-size: 15px;
+            line-height: 25px;
+            color: cornflowerblue;
+            display: block;
+            padding: 0;
+            vertical-align: middle;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .info{
+            font-size: 20px;
+            letter-spacing: 3px;
+            color: #aed7dd;
+            margin-top: 30px;
+            margin-left: 180px;
+            text-align: left;
+        }
+        #p1{
+            border: burlywood solid;
+            border-width: 0 10px 3px 0;
+            border-top-left-radius: 20px;
+            margin: 0;
+            text-align: center;
+            color: cornflowerblue;
+            background: #fffcff;
+            line-height: 45px;
+            letter-spacing: 5px;
+            font-size: 20px;
+        }
+        #p2{
+            text-align: center;
+            font-size: 45px;
+            margin-top: 120px;
+            color: #aed7dd;
+            letter-spacing: 10px;
+        }
+        .sub-style{
+            box-sizing: border-box;
+            display: block;
+            background: aliceblue;
+            color: burlywood;
+            height: 30px;
+            width: 150px;
+            text-align: center;
+            font-size: 15px;
+            letter-spacing: 5px;
+            border: #eddd63 solid 3px;
+            border-radius: 10px;
+            float: bottom;
+            margin: 0 auto;
+        }
+        .sub-style:hover{
+            background: #fffcff;
+            color: #aed7dd;
+        }
+        .sub_style{
+             box-sizing: border-box;
+             display: inline-block;
+             background: lemonchiffon;
+             color: burlywood;
+             height: 23px;
+             width: 80px;
+             text-align: center;
+             font-size: 15px;
+             border: #eddd63 solid 1px;
+             border-radius: 10px;
+             float: right;
+             margin: 0 45px 0 0;
+         }
+        .sub_style:hover{
+            background: #fffcff;
+            color: #aed7dd;
+        }
+        #apply{
+            height: 50px;
+            border: burlywood solid;
+            border-width: 3px 10px 0 0;
+            border-bottom-left-radius: 20px;
+            background: cornflowerblue;
+        }
+        #p3{
+            text-align: center;
+            line-height: 45px;
+            letter-spacing: 5px;
+            font-size: 20px;
+            margin: 0;
+            color: #fffcff;
+        }
+        /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+        ::-webkit-scrollbar
+        {
+            width: 10px;
+            background-color: transparent;
+        }
+        /*定义滚动条轨道 内阴影+圆角*/
+        ::-webkit-scrollbar-track
+        {
+            background-color: burlywood;
+        }
+        /*定义滑块 内阴影+圆角*/
+        ::-webkit-scrollbar-thumb
+        {
+            background-color: cornflowerblue;
+        }
+    </style>
+</head>
+<body>
+    <div id="list">
+        <p id="p1" onclick="toDetail()">我的好友列表</p>
+        <ul id="buddy_list"></ul>
+        <div id="apply">
+            <p id="p3" onclick="toApply()">我的好友申请</p>
+        </div>
+    </div>
+    <div id="detail">
+        <p id="p2">好友详情页</p>
+    </div>
+<script>
+    var userId=localStorage.getItem("id");
+    var buddy=localStorage.getItem("buddyList").split(",");
+    var websocket=parent.websocket;
+    var _list=document.getElementById("buddy_list");
+    var pxhttp=parent.xhttp;
+    if(buddy[0]===""){
+        var text=document.createElement("li");
+        text.innerText="暂未添加好友";
+        text.className="unselected";
+        _list.appendChild(text);
+    }else{
+        for(var i=0;i<buddy.length/2;i++){
+            var newChild=document.createElement("li");
+            newChild.innerText=buddy[i*2+1];
+            newChild.className="lis unselected";
+            newChild.tabIndex=i;
+            newChild.onclick=function(){
+                pxhttp.index=this.tabIndex;
+                buddyColor(this.tabIndex);
+                pxhttp.open("POST","/details",true);
+                pxhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+                pxhttp.send("buddyId="+buddy[this.tabIndex*2]);
+                pxhttp.onreadystatechange=function(){
+                    if(pxhttp.status===200&&pxhttp.readyState===4){
+                        var infos=pxhttp.responseText.split("+");
+                        document.getElementById("detail").innerHTML=
+                            "<p class='info'>用户ID："+infos[0]+"</p>"+
+                            "<p class='info'>用户名："+infos[1]+"</p>"+
+                            "<p class='info'>性&emsp;别："+infos[2]+"</p>"+
+                            "<p class='info'>生&emsp;日："+infos[3]+"</p>"+
+                            "<button class='sub-style' onclick='toBuddy("+buddy[this.index*2]+")'>发消息</button><p style='height: 10px;margin: 0'></p><button class='sub-style' onclick='deleteBuddy("+this.index*2+")'>删除好友</button>";
+                    }
+                }
+            }
+            _list.appendChild(newChild);
+        }
+    }
+    function toDetail() {
+        document.getElementById("detail").innerHTML="<p id='p2'>好友详情页</p>";
+    }
+    function toApply() {
+        pxhttp.open("POST","/allApply",true);
+        pxhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+        pxhttp.send("id="+userId);
+        pxhttp.onreadystatechange=function() {
+            if (pxhttp.status === 200 && pxhttp.readyState === 4) {
+                var resp = JSON.parse(pxhttp.responseText);
+                var received = resp[0];
+                var sent = resp[1];
+                var detail=document.getElementById("detail");
+                var child1=document.createElement("div");
+                var child2=document.createElement("div");
+                child1.id="received";
+                child2.id="sent";
+                child1.className="child";
+                child2.className="child";
+                child1.innerHTML="我收到的申请<br/>";
+                child2.innerHTML="我发出的申请<br/>";
+                if(received.length===0){
+                    var nc_r_n=document.createElement("span");
+                    nc_r_n.innerHTML="无";
+                    child1.appendChild(nc_r_n);
+                }
+                if(sent.length===0){
+                    var nc_s_n=document.createElement("span");
+                    nc_s_n.innerHTML="无";
+                    child2.appendChild(nc_s_n);
+                }
+                for (var i = 0; i < received.length; i++) {
+                    var nc_r=document.createElement("span");
+                    var rece=received[i].split(" ");
+                    nc_r.innerHTML=received[i]+"<button class='sub_style' onclick='add("+rece[0]+","+rece[1]+")'>添加好友</button>";
+                    child1.appendChild(nc_r);
+                }
+                for (var i = 0; i < sent.length; i++) {
+                    var nc_s=document.createElement("span");
+                    nc_s.innerHTML=sent[i]+"<button class='sub_style' onclick='reduce("+(sent[i].split(' '))[0]+")'>撤销申请</button>"
+                    child2.appendChild(nc_s);
+                }
+                detail.innerText="";
+                detail.appendChild(child1);
+                detail.appendChild(child2);
+            }
+        }
+    }
+    function buddyColor(index) {
+        var buddies=document.getElementById("buddy_list");
+        var lis=buddies.getElementsByTagName("li");
+        for(var i=0;i<lis.length;i++){
+            lis[i].className="lis unselected";
+        }
+        lis[index].className="lis selected";
+    }
+    function toBuddy(buddyId) {
+        localStorage.setItem("current_buddy",buddyId);
+        parent.location.href="home#chat";
+        parent.location.reload();
+    }
+    function deleteBuddy(del) {
+        pxhttp.open("POST","/buddyDelete",true);
+        pxhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+        pxhttp.send("id="+userId+"&buddyId="+buddy[del]);
+        pxhttp.onreadystatechange=function(){
+            if(pxhttp.status===200&&pxhttp.readyState===4){
+                var time=(new Date()).toLocaleString();
+                var msgJ={
+                    type:"delete",
+                    name:buddy[del],
+                    time:time
+                }
+                var msg=JSON.stringify(msgJ);
+                websocket.send(msg);
+                buddy.splice(del,2);
+                if(localStorage.getItem("current_buddy")===buddy[del]){
+                    localStorage.setItem("current_buddy","");
+                }
+                localStorage.setItem("buddyList",buddy.toLocaleString());
+                window.location.reload();
+            }
+        }
+    }
+    function add(buddyId,buddyName) {
+        console.log(buddyId);
+        pxhttp.open("POST","/agreeApply",true);
+        pxhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+        pxhttp.send("id="+userId+"&buddyId="+buddyId);
+        pxhttp.onreadystatechange=function(){
+            if(pxhttp.status===200&&pxhttp.readyState===4){
+                buddy.push(buddyId);
+                buddy.push(buddyName);
+                if(buddy[0]===""){
+                    buddy.splice(0,1);
+                }
+                localStorage.setItem("buddyList",buddy);
+                window.location.reload();
+                var time=(new Date()).toLocaleString();
+                var msgJ={
+                    type:"add",
+                    name:buddyId,
+                    time:time
+                }
+                var msg=JSON.stringify(msgJ);
+                websocket.send(msg);
+            }
+        }
+    }
+    function reduce(buddyId) {
+        pxhttp.open("POST","/deleteApply",true);
+        pxhttp.setRequestHeader('content-type','application/x-www-form-urlencoded');
+        pxhttp.send("id="+userId+"&buddyId="+buddyId);
+        pxhttp.onreadystatechange=function(){
+            if(pxhttp.status===200&&pxhttp.readyState===4){
+                var time=(new Date()).toLocaleString();
+                var msgJ={
+                    type:"reduce",
+                    name:buddyId,
+                    time:time
+                }
+                var msg=JSON.stringify(msgJ);
+                websocket.send(msg);
+                window.location.reload();
+            }
+        }
+    }
+</script>
+</body>
+</html>

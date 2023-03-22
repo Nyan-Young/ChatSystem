@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ch/zn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>我的-退出登录</title>
+    <style>
+        html{
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            background: honeydew;
+        }
+        #mine_logout{
+            height: 270px;
+            width: 400px;
+            margin: 0 auto;
+            background: #aed7dd;
+            border: #fffcff dotted 5px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .info{
+            font-size: 25px;
+            letter-spacing: 3px;
+            color: lemonchiffon;
+            margin: 0 auto;
+            padding-top: 30px;
+            text-align: center;
+        }
+        .sub-style{
+            box-sizing: border-box;
+            background: lemonchiffon;
+            color: burlywood;
+            height: 50px;
+            width: 150px;
+            text-align: center;
+            font-size: 20px;
+            border: #eddd63 solid 3px;
+            border-radius: 25px;
+            margin-top: 30px;
+        }
+        .sub-style:hover{
+            background: #fffcff;
+            color: #aed7dd;
+        }
+    </style>
+</head>
+<body>
+<div id="mine_logout">
+    <p class="info">是否退出登录？</p>
+    <input class="sub-style" type="button" value="退&emsp;出" onclick="logout()"><br/>
+    <input class="sub-style" type="button" value="返&emsp;回" onclick="parent.parent.location.href='home'">
+</div>
+<script>
+    //tab我的-退出登录
+    function logout() {
+        localStorage.clear();
+        parent.parent.location.href="index";
+    }
+</script>
+</body>
+</html>
